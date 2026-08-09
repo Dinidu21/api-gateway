@@ -1,0 +1,40 @@
+name: Bump parent submodule pointer
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  bump-parent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout parent repo
+        uses: actions/checkout@v4
+        with:
+          repository: Dinidu21/backend-platform
+          token: ${{ secrets.PARENT_PAT }}
+          fetch-depth: 0
+          submodules: true
+
+      - name: Update submodule pointer to latest main
+        run: |
+          git -C "api-gateway" fetch origin main
+          git -C "api-gateway" checkout origin/main
+
+      - name: Open PR against parent
+        id: pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PARENT_PAT }}
+          commit-message: "chore: bump api-gateway submodule"
+          branch: "bump/api-gateway"
+          title: "chore: bump api-gateway submodule"
+          body: |
+            Automated submodule pointer bump.
+
+            Source repository: Dinidu21/api-gateway
+            Parent repository: Dinidu21/backend-platform
+            Triggered by push to api-gateway/main.
+
+          delete-branch: true
