@@ -39,9 +39,12 @@ jobs:
 
           delete-branch: true
 
-      - name: Auto-merge
+      - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-number
         env:
           GH_TOKEN: ${{ secrets.PARENT_PAT }}
         run: |
-          gh pr merge "${{ steps.pr.outputs.pull-request-number }}"             --repo "Dinidu21/backend-platform"             --squash             --admin
+          gh pr merge "${{ steps.pr.outputs.pull-request-number }}" \
+            --repo "Dinidu21/backend-services" \
+            --squash \
+            --auto
