@@ -38,3 +38,10 @@ jobs:
             Triggered by push to api-gateway/main.
 
           delete-branch: true
+
+      - name: Auto-merge
+        if: steps.pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.PARENT_PAT }}
+        run: |
+          gh pr merge "${{ steps.pr.outputs.pull-request-number }}"             --repo "Dinidu21/backend-platform"             --squash             --admin
