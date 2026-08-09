@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: bump-backend-platform
+  cancel-in-progress: false
+
 jobs:
   bump-parent:
     runs-on: ubuntu-latest
@@ -44,7 +48,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PARENT_PAT }}
         run: |
-          gh pr merge "${{ steps.pr.outputs.pull-request-number }}" \
-            --repo "Dinidu21/backend-services" \
-            --squash \
-            --auto
+          gh pr merge "${{ steps.pr.outputs.pull-request-url }}"             --squash             --auto
