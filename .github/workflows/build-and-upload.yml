@@ -1,0 +1,77 @@
+name: Build and Upload JAR to GCS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: build-api-gateway
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload:
+    name: Build and Upload
+    runs-on: ubuntu-latest
+
+    environment: production
+
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER }}
+      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Get project version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          VERSION="${BASE_VERSION}-${SHA_SHORT}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Build JAR
+        run: ./mvnw -B clean package -DskipTests
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Upload JAR to GCS
+        shell: bash
+        run: |
+          set -euo pipefail
+          JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" ! -name "*sources*" ! -name "*javadoc*")
+          if [[ -z "$JAR_FILE" ]]; then
+            echo "ERROR: No JAR file found in target/"
+            exit 1
+          fi
+          DESTINATION="gs://${GCS_BUCKET}/api-gateway/${{ steps.version.outputs.version }}/api-gateway.jar"
+          echo "Uploading ${JAR_FILE}"
+          echo "Destination: ${DESTINATION}"
+          gcloud storage cp "$JAR_FILE" "$DESTINATION"

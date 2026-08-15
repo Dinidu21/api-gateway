@@ -1,24 +1,5 @@
 spring:
   application:
     name: api-gateway
-
   config:
-    import: "configserver:http://localhost:8888"
-
-  # cloud:
-  #   gateway:
-  #     routes:
-  #       - id: user-service
-  #         uri: lb://user-service
-  #         predicates:
-  #           - Path=/api/users/**
-
-  #       - id: event-booking-service
-  #         uri: lb://event-booking-service
-  #         predicates:
-  #           - Path=/api/events/**
-
-  #       - id: review-notification-service
-  #         uri: lb://review-notification-service
-  #         predicates:
-  #           - Path=/api/reviews/**
+    import: "configserver:http://config-server.eventsphere.internal:8888"
