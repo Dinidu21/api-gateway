@@ -3,7 +3,55 @@ spring:
     name: api-gateway
   config:
     import: "configserver:http://config-server.eventsphere.internal:8888"
-    fail-fast: true
-    retry:
-      max-attempts: 5
-      initial-interval: 1000
+  cloud:
+    gateway:
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+            methods: GET, POST
+            backoff:
+              firstBackoff: 100ms
+              maxBackoff: 500ms
+              factor: 2
+              basedOnPreviousValue: false
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+            maxAge: 3600
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          order: 0
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+        - id: event-booking-service
+          uri: lb://event-booking-service
+          order: 0
+          predicates:
+            - Path=/api/events/**, /api/ticket-types/**, /api/bookings/**
+          filters:
+            - StripPrefix=1
+        - id: review-notification-service
+          uri: lb://review-notification-service
+          order: 0
+          predicates:
+            - Path=/api/reviews/**
+          filters:
+            - StripPrefix=1
