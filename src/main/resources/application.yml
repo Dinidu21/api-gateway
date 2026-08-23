@@ -3,3 +3,7 @@ spring:
     name: api-gateway
   config:
     import: "configserver:http://config-server.eventsphere.internal:8888"
+    fail-fast: true
+    retry:
+      max-attempts: 5
+      initial-interval: 1000
