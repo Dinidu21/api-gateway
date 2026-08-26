@@ -7,47 +7,12 @@ spring:
 
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            - id: user-service
-              uri: lb://user-service
-              predicates:
-                - Path=/api/users/**
-              filters:
-                - StripPrefix=1
-
-            - id: event-booking-service
-              uri: lb://event-booking-service
-              predicates:
-                - Path=/api/events/**
-                - Path=/api/ticket-types/**
-                - Path=/api/bookings/**
-              filters:
-                - StripPrefix=1
-
-            - id: review-notification-service-multipart
-              uri: lb://review-notification-service
-              order: -1
-              predicates:
-                - Path=/api/reviews
-                - Method=POST
-              filters:
-                - StripPrefix=1
-
-            - id: review-notification-service
-              uri: lb://review-notification-service
-              predicates:
-                - Path=/api/reviews/**
-              filters:
-                - StripPrefix=1
-
       default-filters:
         - name: Retry
           args:
             retries: 3
             statuses: BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
-            methods: GET, POST
+            methods: GET
             backoff:
               firstBackoff: 100ms
               maxBackoff: 500ms
@@ -55,6 +20,7 @@ spring:
               basedOnPreviousValue: false
 
       globalcors:
+        add-to-simple-url-handler-mapping: true
         cors-configurations:
           "[/**]":
             allowedOrigins:
@@ -74,15 +40,50 @@ spring:
             allowCredentials: true
             maxAge: 3600
 
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+              filters:
+                - StripPrefix=1
+
+            - id: event-booking-service
+              uri: lb://event-booking-service
+              predicates:
+                - Path=/api/events/**,/api/ticket-types/**,/api/bookings/**
+              filters:
+                - StripPrefix=1
+
+            - id: review-notification-service-multipart
+              uri: lb://review-notification-service
+              order: -1
+              predicates:
+                - Path=/api/reviews
+                - Method=POST
+              filters:
+                - StripPrefix=1
+
+            - id: review-notification-service
+              uri: lb://review-notification-service
+              predicates:
+                - Path=/api/reviews/**
+              filters:
+                - StripPrefix=1
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus,gateway,loggers,threaddump,heapdump,env,configprops,beans,mappings,refresh
+
   endpoint:
     health:
       show-details: always
       show-components: always
+
     gateway:
       enabled: true
 
