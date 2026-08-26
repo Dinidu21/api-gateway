@@ -2,8 +2,8 @@ spring:
   application:
     name: api-gateway
 
-  config:
-    import: "configserver:http://config-server.eventsphere.internal:8888"
+  # config:
+  #   import: "configserver:http://config-server.eventsphere.internal:8888"
 
   cloud:
     gateway:
@@ -12,34 +12,12 @@ spring:
           args:
             retries: 3
             statuses: BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
-            methods: GET
+            methods: GET, POST
             backoff:
               firstBackoff: 100ms
               maxBackoff: 500ms
               factor: 2
               basedOnPreviousValue: false
-
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        cors-configurations:
-          "[/**]":
-            allowedOrigins:
-              - "http://localhost:3000"
-              - "http://136.68.42.194"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-              - PATCH
-            allowedHeaders: "*"
-            exposedHeaders:
-              - Content-Type
-              - Authorization
-            allowCredentials: true
-            maxAge: 3600
-
       server:
         webflux:
           routes:
