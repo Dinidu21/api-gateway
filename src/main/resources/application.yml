@@ -2,8 +2,8 @@ spring:
   application:
     name: api-gateway
 
-  # config:
-  #   import: "configserver:http://config-server.eventsphere.internal:8888"
+  config:
+    import: "configserver:http://config-server.eventsphere.internal:8888"
 
   cloud:
     gateway:
