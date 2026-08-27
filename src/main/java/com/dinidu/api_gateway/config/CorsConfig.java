@@ -11,38 +11,39 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Bean
-    public CorsWebFilter corsWebFilter() {
+        @Bean
+        public CorsWebFilter corsWebFilter() {
 
-        CorsConfiguration configuration = new CorsConfiguration();
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://136.68.42.194",
-                "https://eventsphere-frontend-149096254626.asia-south1.run.app"));
+                configuration.setAllowedOrigins(List.of(
+                                "http://localhost:3000",
+                                "http://8.232.202.240/",
+                                "http://136.68.42.194",
+                                "https://eventsphere-frontend-149096254626.asia-south1.run.app"));
 
-        configuration.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "PATCH",
-                "OPTIONS"));
+                configuration.setAllowedMethods(List.of(
+                                "GET",
+                                "POST",
+                                "PUT",
+                                "DELETE",
+                                "PATCH",
+                                "OPTIONS"));
 
-        configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowedHeaders(List.of("*"));
 
-        configuration.setExposedHeaders(List.of(
-                "Content-Type",
-                "Authorization"));
+                configuration.setExposedHeaders(List.of(
+                                "Content-Type",
+                                "Authorization"));
 
-        configuration.setAllowCredentials(true);
+                configuration.setAllowCredentials(true);
 
-        configuration.setMaxAge(3600L);
+                configuration.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", configuration);
+                source.registerCorsConfiguration("/**", configuration);
 
-        return new CorsWebFilter(source);
-    }
+                return new CorsWebFilter(source);
+        }
 }
