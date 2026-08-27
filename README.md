@@ -2,6 +2,13 @@
 
 Edge server and API gateway for the EventSphere microservices platform, built with **Spring Cloud Gateway** and **Spring WebFlux**.
 
+## Student Information
+
+- **Student Name:** Dinidu Sachintha
+- **Student Number:** 241711028
+- **Slack Handle:** [U0BF767MA4S](https://ijse-eca-hdse-71-72.slack.com/team/U0BF767MA4S)
+- **GCP Project ID:** eventsphere-504909
+
 ## Overview
 
 The API Gateway serves as the single entry point for all client requests. It routes incoming HTTP traffic to the appropriate downstream microservices, handles cross-origin resource sharing (CORS), and provides resilience patterns like retries and circuit breaking.
